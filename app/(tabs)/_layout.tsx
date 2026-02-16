@@ -1,33 +1,54 @@
-import { Tabs } from 'expo-router';
-import React from 'react';
-
-import { HapticTab } from '@/components/haptic-tab';
-import { IconSymbol } from '@/components/ui/icon-symbol';
-import { Colors } from '@/constants/theme';
-import { useColorScheme } from '@/hooks/use-color-scheme';
+import { Tabs } from "expo-router";
+import { Ionicons } from "@expo/vector-icons";
+import { useAppTheme } from "../../components/theme"; // Import hook tema
 
 export default function TabLayout() {
-  const colorScheme = useColorScheme();
+  const { theme, isDark } = useAppTheme(); // Ambil data tema
 
   return (
     <Tabs
       screenOptions={{
-        tabBarActiveTintColor: Colors[colorScheme ?? 'light'].tint,
         headerShown: false,
-        tabBarButton: HapticTab,
-      }}>
+        tabBarActiveTintColor: "#028090", // Warna saat icon aktif
+        tabBarInactiveTintColor: theme.subText, // Warna saat icon tidak aktif
+        tabBarStyle: { 
+          height: 60, 
+          paddingBottom: 8,
+          borderTopWidth: 1, 
+          // Border atas disesuaikan agar tidak terlalu mencolok di dark mode
+          borderTopColor: theme.border, 
+          backgroundColor: theme.card, // Warna background tab bar
+          elevation: 10,
+          shadowColor: "#000",
+          shadowOpacity: 0.1,
+        },
+      }}
+    >
       <Tabs.Screen
         name="index"
         options={{
-          title: 'Home',
-          tabBarIcon: ({ color }) => <IconSymbol size={28} name="house.fill" color={color} />,
+          title: "Edukasi",
+          tabBarIcon: ({ color }) => (
+            <Ionicons name="book" size={24} color={color} />
+          ),
         }}
       />
       <Tabs.Screen
-        name="explore"
+        name="perbandingan"
         options={{
-          title: 'Explore',
-          tabBarIcon: ({ color }) => <IconSymbol size={28} name="paperplane.fill" color={color} />,
+          title: "Perbandingan",
+          tabBarIcon: ({ color }) => (
+            <Ionicons name="bar-chart" size={24} color={color} />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="tips"
+        options={{
+          title: "Tips Panduan",
+          tabBarIcon: ({ color }) => (
+            <Ionicons name="bulb" size={24} color={color} />
+          ),
         }}
       />
     </Tabs>
