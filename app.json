@@ -8,7 +8,8 @@
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/logo.png",
         "backgroundColor": "#028090"
-      }
+      },
+      "package": "com.dickyassidiq.investinapp"
     },
     "plugins": [
       "expo-router",
@@ -17,10 +18,16 @@
         {
           "image": "./assets/images/logo.png",
           "resizeMode": "contain",
-          "backgroundColor": "#028090", 
+          "backgroundColor": "#028090",
           "imageWidth": 150
         }
       ]
-    ]
+    ],
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "b03b032f-c124-4f31-883b-6b77742904c9"
+      }
+    }
   }
 }
