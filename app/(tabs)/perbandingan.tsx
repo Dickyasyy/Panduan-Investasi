@@ -8,79 +8,61 @@ import {
   ActivityIndicator,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import { useAppTheme } from "../../components/theme"; 
+import { useAppTheme } from "../../components/theme";
 
 export default function HargaScreen() {
-  const { theme, isDark } = useAppTheme(); // Gunakan global theme
+  const { theme, isDark } = useAppTheme();
   const [marketData, setMarketData] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
 
   const fetchData = async () => {
     try {
-      const response = await fetch(
+      const coingeckoRes = await fetch(
         "https://api.coingecko.com/api/v3/simple/price?ids=bitcoin,pax-gold&vs_currencies=idr&include_24hr_change=true"
-      );
-      const data = await response.json();
+      ).catch(() => null);
+      const cryptoData = coingeckoRes ? await coingeckoRes.json() : null;
 
-      const ihsgRes = await fetch(
-        "https://query1.finance.yahoo.com/v8/finance/chart/^JKSE?interval=1d"
-      );
-      const ihsgData = await ihsgRes.json();
-      const ihsgPrice = ihsgData.chart.result[0].meta.regularMarketPrice;
-      const ihsgPrev = ihsgData.chart.result[0].meta.previousClose;
-      const ihsgChange = ((ihsgPrice - ihsgPrev) / ihsgPrev) * 100;
-
-      const usdResponse = await fetch(
+      const usdRes = await fetch(
         "https://api.exchangerate-api.com/v4/latest/USD"
-      );
-      const usdData = await usdResponse.json();
+      ).catch(() => null);
+      const usdData = usdRes ? await usdRes.json() : null;
 
+      // Filter: Hanya Emas, Saham, USD, Bitcoin
       const formattedData = [
         {
           id: "1",
           nama: "Emas Antam (Gram)",
-          harga: (data["pax-gold"].idr / 31.1035) * 1.05,
-          perubahan: data["pax-gold"].idr_24h_change,
-          risiko: "Rendah",
-          warnaRisiko: "#4CAF50",
+          harga: cryptoData
+            ? (cryptoData["pax-gold"].idr / 31.1035) * 1.05
+            : 1250000,
+          perubahan: cryptoData?.["pax-gold"].idr_24h_change || 0.25,
+          warna: "#D4AF37",
           icon: "medal-outline",
         },
         {
           id: "2",
-          nama: "IHSG (Saham)",
-          harga: ihsgPrice,
-          perubahan: ihsgChange,
-          risiko: "Tinggi",
-          warnaRisiko: "#C62828",
+          nama: "Saham IHSG",
+          harga: 7350.12,
+          perubahan: 0.15,
+          warna: "#4CAF50",
           icon: "trending-up-outline",
         },
         {
           id: "3",
-          nama: "Reksa Dana",
-          harga: 1540.25,
-          perubahan: 0.45,
-          risiko: "Sedang",
-          warnaRisiko: "#2196F3",
-          icon: "business-outline",
+          nama: "US Dollar (Kurs)",
+          harga: usdData ? usdData.rates.IDR : 15750,
+          perubahan: -0.12,
+          warna: "#85bb65",
+          icon: "cash-outline",
         },
         {
           id: "4",
           nama: "Bitcoin (Crypto)",
-          harga: data.bitcoin.idr,
-          perubahan: data.bitcoin.idr_24h_change,
-          risiko: "Tinggi",
-          warnaRisiko: "#C62828",
+          harga: cryptoData ? cryptoData.bitcoin.idr : 950000000,
+          perubahan: cryptoData?.bitcoin.idr_24h_change || 1.5,
+          warna: "#F7931A",
           icon: "logo-bitcoin",
-        },
-        {
-          id: "5",
-          nama: "US Dollar (USD/IDR)",
-          harga: usdData.rates.IDR,
-          perubahan: 0.05,
-          risiko: "Tinggi",
-          warnaRisiko: "#C62828",
-          icon: "cash-outline",
         },
       ];
 
@@ -106,7 +88,6 @@ export default function HargaScreen() {
     return (
       <View style={[styles.center, { backgroundColor: theme.background }]}>
         <ActivityIndicator size="large" color={theme.tint} />
-        <Text style={{ marginTop: 10, color: theme.subText }}>Menghubungkan ke Bursa...</Text>
       </View>
     );
   }
@@ -114,55 +95,44 @@ export default function HargaScreen() {
   return (
     <View style={[styles.mainWrapper, { backgroundColor: theme.background }]}>
       <ScrollView
-        style={styles.container}
         refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={theme.tint} />
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
         }
-        contentContainerStyle={{
-          paddingHorizontal: 20,
-          paddingTop: 10,
-          paddingBottom: 60,
-        }}
+        contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
       >
-        <Text style={[styles.header, { color: theme.text }]}>Ringkasan Pasar</Text>
+        <Text style={[styles.header, { color: theme.text }]}>
+          Ringkasan Pasar
+        </Text>
         <Text style={[styles.subHeader, { color: theme.subText }]}>
-          Pantauan instrumen investasi terpopuler
+          Estimasi harga aset saat ini
         </Text>
 
         {marketData.map((item) => (
-          <View key={item.id} style={[styles.priceCard, { backgroundColor: theme.card }]}>
+          <View
+            key={item.id}
+            style={[styles.priceCard, { backgroundColor: theme.card }]}
+          >
             <View style={styles.cardInfo}>
               <View
                 style={[
                   styles.iconCircle,
-                  { backgroundColor: item.warnaRisiko + "15" },
+                  { backgroundColor: item.warna + "15" },
                 ]}
               >
                 <Ionicons
                   name={item.icon as any}
-                  size={20}
-                  color={item.warnaRisiko}
+                  size={22}
+                  color={item.warna}
                 />
               </View>
               <View>
-                <Text style={[styles.assetName, { color: theme.subText }]}>{item.nama}</Text>
-                <Text style={[styles.price, { color: theme.text }]}>
-                  {item.id === "2" ? "" : "IDR "}
-                  {item.harga.toLocaleString("id-ID", {
-                    maximumFractionDigits: 2,
-                  })}
+                <Text style={[styles.assetName, { color: theme.subText }]}>
+                  {item.nama}
                 </Text>
-                <View
-                  style={[
-                    styles.riskTag,
-                    { backgroundColor: item.warnaRisiko + "20" },
-                  ]}
-                >
-                  <Text style={[styles.riskText, { color: item.warnaRisiko }]}>
-                    Risiko: {item.risiko}
-                  </Text>
-                </View>
+                <Text style={[styles.price, { color: theme.text }]}>
+                  IDR {item.harga.toLocaleString("id-ID")}
+                </Text>
               </View>
             </View>
 
@@ -170,14 +140,15 @@ export default function HargaScreen() {
               style={[
                 styles.badge,
                 {
-                  backgroundColor: item.perubahan >= 0 ? (isDark ? "#064e3b" : "#e8f5e9") : (isDark ? "#450a0a" : "#ffebee"),
+                  backgroundColor:
+                    item.perubahan >= 0 ? "#4CAF5020" : "#F4433620",
                 },
               ]}
             >
               <Text
                 style={[
                   styles.changeText,
-                  { color: item.perubahan >= 0 ? (isDark ? "#4ade80" : "#2e7d32") : (isDark ? "#fca5a5" : "#c62828") },
+                  { color: item.perubahan >= 0 ? "#4CAF50" : "#F44336" },
                 ]}
               >
                 {item.perubahan >= 0 ? "▲" : "▼"}{" "}
@@ -188,31 +159,81 @@ export default function HargaScreen() {
         ))}
 
         {/* TABEL PERBANDINGAN STRATEGIS */}
-        <View style={[styles.eduSection, { backgroundColor: theme.card }]}>
-          <Text style={[styles.eduTitle, { color: theme.text }]}>📊 Tabel Perbandingan Aset</Text>
-          <View style={[styles.table, { borderColor: theme.border }]}>
-            <View style={[styles.tableRow, { backgroundColor: isDark ? theme.background : "#F0F4F8", borderBottomColor: theme.border }]}>
-              <Text style={[styles.tableHead, { color: theme.subText }]}>Aset</Text>
-              <Text style={[styles.tableHead, { color: theme.subText }]}>Likuiditas</Text>
-              <Text style={[styles.tableHead, { color: theme.subText }]}>Jangka Waktu</Text>
+        <View style={styles.eduContainer}>
+          <Text style={[styles.eduTitle, { color: theme.text }]}>
+            📊 Perbandingan Strategis
+          </Text>
+          <View
+            style={[
+              styles.modernTable,
+              { backgroundColor: theme.card, borderColor: theme.border },
+            ]}
+          >
+            {/* Header */}
+            <View
+              style={[
+                styles.tableHeader,
+                { backgroundColor: isDark ? "#1e293b" : "#f8fafc" },
+              ]}
+            >
+              <Text
+                style={[styles.col1, styles.headText, { color: theme.subText }]}
+              >
+                Aset
+              </Text>
+              <Text
+                style={[styles.col2, styles.headText, { color: theme.subText }]}
+              >
+                Risiko
+              </Text>
+              <Text
+                style={[styles.col3, styles.headText, { color: theme.subText }]}
+              >
+                Jangka Ideal
+              </Text>
             </View>
+
+            {/* Rows */}
             {[
-              { a: "Emas", b: "Tinggi", c: "> 2 Thn" },
-              { a: "Saham", b: "Sedang", c: "> 5 Thn" },
-              { a: "Reksa Dana", b: "Tinggi", c: "1-3 Thn" },
-              { a: "Crypto", b: "S. Tinggi", c: "Pendek" },
-            ].map((row, index) => (
-              <View key={index} style={[styles.tableRow, { borderBottomColor: theme.border }]}>
-                <Text style={[styles.tableCell, { color: theme.text }]}>{row.a}</Text>
-                <Text style={[styles.tableCell, { color: theme.text }]}>{row.b}</Text>
-                <Text style={[styles.tableCell, { color: theme.text }]}>{row.c}</Text>
+              { n: "Emas", r: "Rendah", t: "> 5 Tahun", c: "#D4AF37" },
+              { n: "Saham", r: "Tinggi", t: "> 5 Tahun", c: "#4CAF50" },
+              { n: "R. Dana", r: "S - R", t: "1 - 3 Tahun", c: "#2196F3" },
+              { n: "Crypto", r: "S. Tinggi", t: "Spekulatif", c: "#F7931A" },
+              { n: "Kurs", r: "Sedang", t: "Pendek", c: "#85bb65" },
+              { n: "Bank Dig.", r: "S. Rendah", t: "Fleksibel", c: "#009688" }, // Penambahan Bank Digital
+            ].map((row, i) => (
+              <View
+                key={i}
+                style={[styles.tableRow, { borderTopColor: theme.border }]}
+              >
+                <View style={styles.col1}>
+                  <Text style={[styles.cellTextBold, { color: theme.text }]}>
+                    {row.n}
+                  </Text>
+                </View>
+                <View style={styles.col2}>
+                  <Text
+                    style={[
+                      styles.riskLabel,
+                      { color: row.c, backgroundColor: row.c + "15" },
+                    ]}
+                  >
+                    {row.r}
+                  </Text>
+                </View>
+                <View style={styles.col3}>
+                  <Text style={[styles.cellText, { color: theme.subText }]}>
+                    {row.t}
+                  </Text>
+                </View>
               </View>
             ))}
           </View>
         </View>
 
         <Text style={[styles.footerNote, { color: theme.subText }]}>
-          Tarik ke bawah untuk memperbarui harga terbaru.
+          Data diperbarui secara berkala. Estimasi harga menggunakan nilai
+          referensi pasar global.
         </Text>
       </ScrollView>
     </View>
@@ -221,96 +242,70 @@ export default function HargaScreen() {
 
 const styles = StyleSheet.create({
   mainWrapper: { flex: 1 },
-  container: { flex: 1 },
+  scrollContent: { padding: 20, paddingBottom: 80 },
   center: { flex: 1, justifyContent: "center", alignItems: "center" },
-
-  header: {
-    fontSize: 24,
-    fontWeight: "bold",
-    marginTop: 10,
-  },
-  subHeader: {
-    fontSize: 13,
-    marginBottom: 20,
-  },
+  header: { fontSize: 26, fontWeight: "bold" },
+  subHeader: { fontSize: 14, marginBottom: 25, opacity: 0.7 },
 
   priceCard: {
-    padding: 16,
-    borderRadius: 20,
+    padding: 18,
+    borderRadius: 24,
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
     marginBottom: 12,
-    elevation: 2,
-    shadowColor: "#000",
-    shadowOpacity: 0.05,
-    shadowRadius: 5,
   },
   cardInfo: { flexDirection: "row", alignItems: "center" },
   iconCircle: {
-    width: 44,
-    height: 44,
-    borderRadius: 22,
+    width: 48,
+    height: 48,
+    borderRadius: 16,
     justifyContent: "center",
     alignItems: "center",
-    marginRight: 12,
+    marginRight: 15,
   },
   assetName: {
-    fontSize: 11,
-    fontWeight: "bold",
-    textTransform: "uppercase",
-  },
-  price: {
-    fontSize: 16,
-    fontWeight: "bold",
-    marginVertical: 2,
-  },
-
-  riskTag: {
-    alignSelf: "flex-start",
-    paddingHorizontal: 6,
-    paddingVertical: 2,
-    borderRadius: 4,
-    marginTop: 2,
-  },
-  riskText: { fontSize: 9, fontWeight: "bold" },
-
-  badge: { paddingHorizontal: 8, paddingVertical: 4, borderRadius: 8 },
-  changeText: { fontSize: 11, fontWeight: "bold" },
-
-  eduSection: {
-    marginTop: 10,
-    padding: 15,
-    borderRadius: 20,
-    elevation: 2,
-  },
-  eduTitle: {
-    fontSize: 15,
-    fontWeight: "bold",
-    marginBottom: 12,
-  },
-  table: {
-    borderRadius: 12,
-    overflow: "hidden",
-    borderWidth: 1,
-  },
-  tableRow: {
-    flexDirection: "row",
-    borderBottomWidth: 1,
-    paddingVertical: 10,
-  },
-  tableHead: {
-    flex: 1,
-    textAlign: "center",
     fontSize: 10,
     fontWeight: "bold",
+    textTransform: "uppercase",
+    letterSpacing: 0.5,
   },
-  tableCell: { flex: 1, textAlign: "center", fontSize: 10 },
+  price: { fontSize: 17, fontWeight: "800", marginTop: 2 },
+  badge: { paddingHorizontal: 10, paddingVertical: 6, borderRadius: 12 },
+  changeText: { fontSize: 12, fontWeight: "bold" },
+
+  eduContainer: { marginTop: 30 },
+  eduTitle: { fontSize: 18, fontWeight: "bold", marginBottom: 15 },
+  modernTable: { borderRadius: 24, borderWidth: 1, overflow: "hidden" },
+  tableHeader: { flexDirection: "row", padding: 15 },
+  tableRow: {
+    flexDirection: "row",
+    padding: 15,
+    alignItems: "center",
+    borderTopWidth: 1,
+  },
+  headText: { fontSize: 12, fontWeight: "bold", textTransform: "uppercase" },
+  cellTextBold: { fontSize: 14, fontWeight: "bold" },
+  cellText: { fontSize: 12, fontWeight: "500" },
+  riskLabel: {
+    fontSize: 10,
+    fontWeight: "bold",
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 8,
+    textAlign: "center",
+    alignSelf: "flex-start",
+  },
+
+  col1: { flex: 1 },
+  col2: { flex: 1 },
+  col3: { flex: 1.2 },
 
   footerNote: {
     textAlign: "center",
-    fontSize: 10,
-    marginTop: 20,
-    marginBottom: 20,
+    fontSize: 11,
+    marginTop: 30,
+    lineHeight: 18,
+    opacity: 0.6,
   },
 });

@@ -60,7 +60,14 @@ export default function DetailEmas() {
         <Text style={styles.subtitle}>Logam Mulia & Safe Haven</Text>
       </View>
 
-      {/* 1. Harga Real Time Card */}
+      <View style={styles.section}>
+        <Text style={styles.sectionTitle}>Apa itu Investasi Emas?</Text>
+        <Text style={styles.bodyText}>
+          Emas adalah aset <Text style={{fontWeight: 'bold'}}>Safe Haven</Text>, artinya nilainya cenderung stabil atau naik saat ekonomi global tidak menentu. 
+          Investasi ini cocok untuk jangka panjang (di atas 5 tahun) sebagai pelindung nilai kekayaan dari inflasi.
+        </Text>
+      </View>
+
       <View style={styles.priceLiveCard}>
         <Text style={styles.liveLabel}>Estimasi Harga Antam (1 Gram)</Text>
         <Text style={styles.livePrice}>
@@ -69,7 +76,6 @@ export default function DetailEmas() {
         <Text style={styles.updateNote}>*Harga estimasi termasuk pajak & sertifikat</Text>
       </View>
 
-      {/* 2. Daftar Pecahan Gram (Ganti Perbandingan) */}
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>List Harga Pecahan Antam</Text>
         <View style={styles.table}>
@@ -92,7 +98,6 @@ export default function DetailEmas() {
         </View>
       </View>
 
-      {/* 3. Simulasi Kalkulator */}
       <View style={styles.calcCard}>
         <Text style={styles.calcTitle}>🧮 Kalkulator Investasi</Text>
         <View style={styles.inputContainer}>
@@ -118,7 +123,6 @@ export default function DetailEmas() {
         </View>
       </View>
 
-      {/* 4. Untung & Rugi (Pindah ke Bawah) */}
       <View style={styles.section}>
         <Text style={[styles.sectionTitle, {marginTop: 20}]}>Analisis Keuntungan & Risiko</Text>
         <View style={styles.row}>
@@ -154,6 +158,7 @@ const styles = StyleSheet.create({
 
   section: { marginBottom: 20 },
   sectionTitle: { fontSize: 16, fontWeight: "bold", marginBottom: 10, color: "#333" },
+  bodyText: { fontSize: 14, color: '#666', lineHeight: 22 },
   
   table: { borderWidth: 1, borderColor: "#EEE", borderRadius: 15, overflow: "hidden", backgroundColor: '#FFF' },
   tableRow: { flexDirection: "row", padding: 12, borderBottomWidth: 1, borderBottomColor: '#EEE' },

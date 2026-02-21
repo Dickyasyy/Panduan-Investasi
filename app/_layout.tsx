@@ -4,7 +4,7 @@ import { ThemeProvider, useAppTheme } from "../components/theme";
 import { Ionicons } from "@expo/vector-icons";
 import { StatusBar } from "expo-status-bar";
 import * as SplashScreen from "expo-splash-screen";
-import { useEffect, useState } from "react"; // Tambahkan useState
+import { useEffect, useState } from "react"; 
 
 // Tahan Splash Screen
 SplashScreen.preventAutoHideAsync();
@@ -73,6 +73,7 @@ function MainStack() {
       <Stack.Screen name="detail/crypto" options={{ headerShown: false }} />
       <Stack.Screen name="detail/reksaDana" options={{ headerShown: false }} />
       <Stack.Screen name="detail/kurs" options={{ headerShown: false }} />
+      <Stack.Screen name="detail/bankDigital" options={{ headerShown: false }} />
     </Stack>
   );
 }

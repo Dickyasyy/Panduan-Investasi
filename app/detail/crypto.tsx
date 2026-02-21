@@ -56,7 +56,7 @@ export default function DetailCrypto() {
 
   return (
     <ScrollView
-      style={styles.container}
+      style={[styles.container, { backgroundColor: "#FFF4E5" }]} // Warna Cream/Oranye Crypto
       showsVerticalScrollIndicator={false}
       contentContainerStyle={{ paddingBottom: 60 }}
     >
@@ -176,8 +176,19 @@ export default function DetailCrypto() {
             <Text style={styles.infoBody}>• Potensi Kenaikan Fantastis</Text>
             <Text style={styles.infoBody}>• Transaksi 24/7 Nonstop</Text>
           </View>
-          <View style={[styles.infoCard, { backgroundColor: "#FFF3E0" }]}>
-            <Text style={styles.infoTitle}>⚠️ Kerugian</Text>
+          <View
+            style={[
+              styles.infoCard,
+              {
+                backgroundColor: "#FFEBEE",
+                borderWidth: 1,
+                borderColor: "#FFCDD2",
+              },
+            ]}
+          >
+            <Text style={[styles.infoTitle, { color: "#C62828" }]}>
+              ⚠️ Kerugian
+            </Text>
             <Text style={styles.infoBody}>• Volatilitas Sangat Tinggi</Text>
             <Text style={styles.infoBody}>• Tidak Ada Jaminan Negara</Text>
             <Text style={styles.infoBody}>• Risiko Keamanan (Hack/Scam)</Text>
@@ -191,10 +202,17 @@ export default function DetailCrypto() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: "#FAFAFA", padding: 20 },
+  container: { flex: 1, padding: 20 },
   loadingCenter: { flex: 1, justifyContent: "center", alignItems: "center" },
   backBtn: { marginTop: 40, marginBottom: 10 },
   headerSection: { alignItems: "center", marginBottom: 25 },
+  calcCard: {
+    backgroundColor: "rgba(255, 255, 255, 0.9)",
+    padding: 20,
+    borderRadius: 20,
+    elevation: 4,
+    marginBottom: 25,
+  },
   emoji: { fontSize: 50, color: "#F7931A", fontWeight: "bold" },
   title: { fontSize: 28, fontWeight: "bold", color: "#1A1A1A" },
   subtitle: { fontSize: 14, color: "#666" },
@@ -220,14 +238,6 @@ const styles = StyleSheet.create({
   textWhite: { color: "#FFF" },
   changeRow: { flexDirection: "row", alignItems: "center", marginTop: 5 },
   changeText: { fontSize: 11, fontWeight: "bold", marginLeft: 4 },
-
-  calcCard: {
-    backgroundColor: "#FFF",
-    padding: 20,
-    borderRadius: 20,
-    elevation: 4,
-    marginBottom: 25,
-  },
   calcTitle: { fontSize: 16, fontWeight: "bold", marginBottom: 15 },
   label: { fontSize: 12, color: "#888" },
   input: {
